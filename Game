@@ -15,16 +15,11 @@
 <script type="text/javascript">
 
 var config = {
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
     width: 800,
     height: 600,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 300 },
-            debug: false
-        }
-    },
+    backgroundColor: '#bfcc00',
+    parent: 'phaser-example',
     scene: {
         preload: preload,
         create: create,
@@ -32,6 +27,16 @@ var config = {
     }
 };
 
+var snake;
+var food;
+var cursors;
+
+//  Direction consts
+var UP = 0;
+var DOWN = 1;
+var LEFT = 2;
+var RIGHT = 3;
+var ME = 10
 var player;
 var stars;
 var bombs;
@@ -52,6 +57,8 @@ var game = new Phaser.Game(config);
 
 function preload ()
 {
+    this.load.image('food', 'assets/games/snake/food.png');
+    this.load.image('body', 'assets/games/snake/body.png');
     this.load.image('coaster', 'assets/coaster.png');
     this.load.image('answer1', 'assets/answer1.png');
     this.load.image('sky', 'assets/sky.png');
@@ -63,6 +70,200 @@ function preload ()
 
 function create ()
 {
+    var Food = new Phaser.Class({
+
+        Extends: Phaser.GameObjects.Image,
+
+        initialize:
+
+        function Food (scene, x, y)
+        {
+            Phaser.GameObjects.Image.call(this, scene)
+
+            this.setTexture('food');
+            this.setPosition(x * 16, y * 16);
+            this.setOrigin(0);
+
+            this.total = 0;
+
+            scene.children.add(this);
+        },
+
+        eat: function ()
+        {
+            this.total++;
+        }
+
+    });
+
+    var Snake = new Phaser.Class({
+
+        initialize:
+
+        function Snake (scene, x, y)
+        {
+            this.headPosition = new Phaser.Geom.Point(x, y);
+
+            this.body = scene.add.group();
+
+            this.head = this.body.create(x * 16, y * 16, 'body');
+            this.head.setOrigin(0);
+
+            this.alive = true;
+
+            this.speed = 100;
+
+            this.moveTime = 0;
+
+            this.tail = new Phaser.Geom.Point(x, y);
+
+            this.heading = RIGHT;
+            this.direction = RIGHT;
+            this.me = ME;
+        },
+
+        update: function (time)
+        {
+            if (time >= this.moveTime)
+            {
+                return this.move(time);
+            }
+        },
+
+        faceLeft: function ()
+        {
+            if (this.direction === UP || this.direction === DOWN)
+            {
+                this.heading = LEFT;
+
+            }
+        },
+
+        faceRight: function ()
+        {
+            if (this.direction === UP || this.direction === DOWN)
+            {
+                this.heading = RIGHT;
+            }
+        },
+
+        faceUp: function ()
+        {
+            if (this.direction === LEFT || this.direction === RIGHT)
+            {
+                this.heading = UP;
+            }
+        },
+
+        faceDown: function ()
+        {
+            if (this.direction === LEFT || this.direction === RIGHT)
+            {
+                this.heading = DOWN;
+            }
+        },
+
+        move: function (time)
+        {
+            /**
+            * Based on the heading property (which is the direction the pgroup pressed)
+            * we update the headPosition value accordingly.
+            * 
+            * The Math.wrap call allow the snake to wrap around the screen, so when
+            * it goes off any of the sides it re-appears on the other.
+            */
+            switch (this.heading)
+            {
+                case LEFT:
+                    this.headPosition.x = Phaser.Math.Wrap(this.headPosition.x - 1, 0, 40);
+                    break;
+
+                case RIGHT:
+                    this.headPosition.x = Phaser.Math.Wrap(this.headPosition.x + 1, 0, 40);
+                    break;
+
+                case UP:
+                    this.headPosition.y = Phaser.Math.Wrap(this.headPosition.y - 1, 0, 30);
+                    break;
+
+                case DOWN:
+                    this.headPosition.y = Phaser.Math.Wrap(this.headPosition.y + 1, 0, 30);
+                    break;
+            }
+
+            this.direction = this.heading;
+
+            //  Update the body segments and place the last coordinate into this.tail
+            Phaser.Actions.ShiftPosition(this.body.getChildren(), this.headPosition.x * 16, this.headPosition.y * 16, 1, this.tail);
+
+            //  Check to see if any of the body pieces have the same x/y as the head
+            //  If they do, the head ran into the body
+
+            var hitBody = Phaser.Actions.GetFirst(this.body.getChildren(), { x: this.head.x, y: this.head.y }, 1);
+
+            if (hitBody)
+            {
+                console.log('dead');
+
+                this.alive = false;
+
+                return false;
+            }
+            else
+            {
+                //  Update the timer ready for the next movement
+                this.moveTime = time + this.speed;
+
+                return true;
+            }
+        },
+
+        grow: function ()
+        {
+            var newPart = this.body.create(this.tail.x, this.tail.y, 'body');
+
+            newPart.setOrigin(0);
+        },
+
+        collideWithFood: function (food)
+        {
+            if (this.head.x === food.x && this.head.y === food.y)
+            {
+                this.grow();
+
+                food.eat();
+
+                //  For every 5 items of food eaten we'll increase the snake speed a little
+                if (this.speed > 20 && food.total % 5 === 0)
+                {
+                    this.speed -= 5;
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        },
+
+        updateGrid: function (grid)
+        {
+            //  Remove all body pieces from valid positions list
+            this.body.children.each(function (segment) {
+
+                var bx = segment.x / 16;
+                var by = segment.y / 16;
+
+                grid[by][bx] = false;
+
+            });
+
+            return grid;
+        }
+
+    });
+
     //  A simple background for our game
     this.add.image(400, 300, 'coaster');
     // game menu
@@ -99,266 +300,188 @@ function create ()
         d = a
 
     // question 
-    up = this.add.text(250, 80, num1 + " + " + num2, { fontSize: '100px', fill: '#000' });
+    message = this.add.text(350, 20, "Begin", { fontSize: '78px', fill: '#000' });
+    question = this.add.text(250, 80, num1 + " + " + num2, { fontSize: '100px', fill: '#000' });
 
 
     // puts "answers" into menu
     up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
     down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
-    left = this.add.text(225, 325, r, { fontSize: '78px', fill: '#000' });
-    right = this.add.text(475, 325, l, { fontSize: '78px', fill: '#000' });
+    left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+    right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
 
-    //  Input Events
+
+    food = new Food(this, 3, 4);
+
+    snake = new Snake(this, 8, 8);
+
+    //  Create our keyboard controls
     cursors = this.input.keyboard.createCursorKeys();
-
-    this.add.text(10, 10, 'Press the SPACE BAR', { font: '16px Courier', fill: '#ffffff' }).setShadow(1, 1);
-
-    var bubble1 = this.createSpeechBubble(20, 180, 220, 80, "Correct");
-    var bubble2 = this.createSpeechBubble(20, 180, 220, 80, "Incorrect");
-    var bubble3 = this.createSpeechBubble(20, 180, 220, 80, "Who knows");
-
-    bubble1.setVisible(false);
-    bubble2.setVisible(false);
-    bubble3.setVisible(false);
-
-    var spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-    //  Phase 1: Key event.
-    //  Emits only when the SPACE BAR is pressed down, and dispatches from the local Key object.
-    //  You can call stopPropagation at this level, which will stop it reaching both listeners below.
-
-    spaceKey.on('down', function (key, event) {
-
-        // event.stopPropagation();
-
-        bubble3.setVisible(true);
-
-    });
-
-    //  Phase 2: Global keydown + keycode handler.
-    //  Emits only on the SPACE BAR keycode event, but dispatches globally.
-    //  You can call stopPropagation at this level, which will stop it reaching the listener below.
-
-    this.input.keyboard.on('keydown-SPACE', function (event) {
-
-        event.stopPropagation();
-
-        bubble2.setVisible(true);
-
-    });
-
-    //  Phase 3: Global keydown handler.
-    //  Fires on ANY key press, so we need to check the keyCode internally.
-
-    this.input.keyboard.on('keydown', function (event) {
-
-        if (event.keyCode === Phaser.Input.Keyboard.KeyCodes.SPACE)
-        {
-            bubble1.setVisible(true);
-        }
-
-    });
-
-
-
-
-
-
-
-    // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'dude');
-
-
-
-
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
-
-    //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'dude', frame: 4 } ],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-
-
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-    stars = this.physics.add.group({
-        key: 'star',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
-    });
-
-    stars.children.iterate(function (child) {
-
-        //  Give each star a slightly different bounce
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-    });
-
-    bombs = this.physics.add.group();
-
-    //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-    //  Collide the player and the stars with the platforms
-    this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
-
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, stars, collectStar, null, this);
-
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
 }
 
-function update ()
+function update (time, delta)
 {
-    if (gameOver)
+    if (!snake.alive)
     {
         return;
     }
 
-    if (cursors.left.isDown)
+    /**
+    * Check which key is pressed, and then change the direction the snake
+    * is heading based on that. The checks ensure you don't double-back
+    * on yourself, for example if you're moving to the right and you press
+    * the LEFT cursor, it ignores it, because the only valid directions you
+    * can move in at that time is up and down.
+    */
+    if (this.input.keyboard.checkDown(cursors.left, 1000))
     {
-        player.setVelocityX(-160);
+        snake.faceLeft();
+        if(l == a){
+            message.setText("CORRECT");
 
-        player.anims.play('left', true);
+        }
+
+        else{
+
+            message.setText("INCORRECT");
+        }
+
+        up.destroy();
+        down.destroy();
+        right.destroy();
+        left.destroy();
+        question.destroy();
+
+        // generate random question and answer
+        num1 = Phaser.Math.Between(1, 12);
+        num2 = Phaser.Math.Between(1, 12);
+        a = num1 + num2
+
+        // generate fake answers
+        u = Phaser.Math.Between(1, 25);
+        while(u == a)
+            u = Phaser.Math.Between(1, 25);
+        d = Phaser.Math.Between(1, 25);
+        while(d == a || d == u)
+            d = Phaser.Math.Between(1, 25);
+        r = Phaser.Math.Between(1, 25);
+        while(r == a || r == u || r == d)
+            r = Phaser.Math.Between(1, 25);
+        l = Phaser.Math.Between(1, 25);
+            while(l == a || l == u || l == d || l == r)
+            l = Phaser.Math.Between(1, 25);
+
+        // randomly replace one of the fake answers with the real answer
+        var temp = Phaser.Math.Between(1, 4);
+        if(temp == 1)
+            r = a
+        else if(temp == 2)
+            l = a
+        else if(temp == 3)
+            u = a
+        else if(temp == 4)
+            d = a
+
+        // question 
+        question = this.add.text(250, 80, num1 + " + " + num2, { fontSize: '100px', fill: '#000' });
+
+
+        // puts "answers" into menu
+        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+
+
+
+
+
     }
     else if (cursors.right.isDown)
     {
-        player.setVelocityX(160);
+        snake.faceRight();
+    }
+    else if (cursors.up.isDown)
+    {
+        snake.faceUp();
+    }
+    else if (cursors.down.isDown)
+    {
+        snake.faceDown();
 
-        player.anims.play('right', true);
+    }
+
+    if (snake.update(time))
+    {
+        //  If the snake updated, we need to check for collision against food
+
+        if (snake.collideWithFood(food))
+        {
+            repositionFood();
+        }
+    }
+}
+
+/**
+* We can place the food anywhere in our 40x30 grid
+* *except* on-top of the snake, so we need
+* to filter those out of the possible food locations.
+* If there aren't any locations left, they've won!
+*
+* @method repositionFood
+* @return {boolean} true if the food was placed, otherwise false
+*/
+function repositionFood ()
+{
+    //  First create an array that assumes all positions
+    //  are valid for the new piece of food
+
+    //  A Grid we'll use to reposition the food each time it's eaten
+    var testGrid = [];
+
+    for (var y = 0; y < 30; y++)
+    {
+        testGrid[y] = [];
+
+        for (var x = 0; x < 40; x++)
+        {
+            testGrid[y][x] = true;
+        }
+    }
+
+    snake.updateGrid(testGrid);
+
+    //  Purge out false positions
+    var validLocations = [];
+
+    for (var y = 0; y < 30; y++)
+    {
+        for (var x = 0; x < 40; x++)
+        {
+            if (testGrid[y][x] === true)
+            {
+                //  Is this position valid for food? If so, add it here ...
+                validLocations.push({ x: x, y: y });
+            }
+        }
+    }
+
+    if (validLocations.length > 0)
+    {
+        //  Use the RNG to pick a random food position
+        var pos = Phaser.Math.RND.pick(validLocations);
+
+        //  And place it
+        food.setPosition(pos.x * 16, pos.y * 16);
+
+        return true;
     }
     else
     {
-        player.setVelocityX(0);
-
-        player.anims.play('turn');
-    }
-
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.setVelocityY(-330);
+        return false;
     }
 }
 
-function collectStar (player, star)
-{
-    star.disableBody(true, true);
-
-    //  Add and update the score
-    score += 10;
-    scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0)
-    {
-        //  A new batch of stars to collect
-        stars.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
-
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
-    }
-}
-
-function hitBomb (player, bomb)
-{
-    this.physics.pause();
-
-    player.setTint(0xff0000);
-
-    player.anims.play('turn');
-
-    gameOver = true;
-}
-
-function render() {
-
-    game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds(), 32, 32);
-
-}
-
-function createSpeechBubble (x, y, width, height, quote)
-{
-    var bubbleWidth = width;
-    var bubbleHeight = height;
-    var bubblePadding = 10;
-    var arrowHeight = bubbleHeight / 3;
-
-    var bubble = this.add.graphics({ x: x, y: y });
-
-    //  Bubble shadow
-    bubble.fillStyle(0x222222, 0.5);
-    bubble.fillRoundedRect(6, 6, bubbleWidth, bubbleHeight, 16);
-
-    //  Bubble color
-    bubble.fillStyle(0xffffff, 1);
-
-    //  Bubble outline line style
-    bubble.lineStyle(4, 0x565656, 1);
-
-    //  Bubble shape and outline
-    bubble.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
-    bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
-
-    //  Calculate arrow coordinates
-    var point1X = Math.floor(bubbleWidth / 4);
-    var point1Y = bubbleHeight;
-    var point2X = Math.floor((bubbleWidth / 4) * 1.4);
-    var point2Y = bubbleHeight;
-    var point3X = Math.floor(bubbleWidth / 4);
-    var point3Y = Math.floor(bubbleHeight + arrowHeight);
-
-    //  Bubble arrow shadow
-    bubble.lineStyle(4, 0x222222, 0.5);
-    bubble.lineBetween(point2X - 1, point2Y + 6, point3X + 2, point3Y);
-
-    //  Bubble arrow fill
-    bubble.fillTriangle(point1X, point1Y, point2X, point2Y, point3X, point3Y);
-    bubble.lineStyle(2, 0x565656, 1);
-    bubble.lineBetween(point2X, point2Y, point3X, point3Y);
-    bubble.lineBetween(point1X, point1Y, point3X, point3Y);
-
-    var content = this.add.text(0, 0, quote, { fontFamily: 'Arial', fontSize: 20, color: '#000000', align: 'center', wordWrap: { width: bubbleWidth - (bubblePadding * 2) } });
-
-    var b = content.getBounds();
-
-    content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
-
-    var container = this.add.container();
-
-    container.add([ bubble, content ]);
-
-    return container;
-}
 
 </script>
 
