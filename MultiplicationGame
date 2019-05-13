@@ -224,7 +224,7 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 - num2
+        a = num1 * num2
 
         // generate fake answers
         u = Phaser.Math.Between(1, 144);
@@ -236,12 +236,12 @@ function update (time, delta)
         r = Phaser.Math.Between(1, 144);
         while(r == a || r == u || r == d)
             r = Phaser.Math.Between(1, 144);
-        l = PPhaser.Math.Between(1, 144);
+        l = Phaser.Math.Between(1, 144);
             while(l == a || l == u || l == d || l == r)
             l = Phaser.Math.Between(1, 144);
 
         // randomly replace one of the fake answers with the real answer
-        var temp = PPhaser.Math.Between(1, 4);
+        var temp = Phaser.Math.Between(1, 4);
         if(temp == 1)
             r = a
         else if(temp == 2)
@@ -285,7 +285,7 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 - num2
+        a = num1 * num2
 
         // generate fake answers
         u = Phaser.Math.Between(1, 144);
@@ -345,7 +345,7 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 - num2
+        a = num1 * num2
 
         // generate fake answers
         u = Phaser.Math.Between(1, 144);
