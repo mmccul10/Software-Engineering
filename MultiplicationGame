@@ -1,0 +1,401 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 10</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var config = {
+    type: Phaser.WEBGL,
+    width: 800,
+    height: 600,
+    backgroundColor: '#bfcc00',
+    parent: 'phaser-example',
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var snake;
+var food;
+var cursors;
+
+//  Direction consts
+var UP = 0;
+var DOWN = 1;
+var LEFT = 2;
+var RIGHT = 3;
+var ME = 10
+var player;
+var stars;
+var bombs;
+var platforms;
+var cursors;
+var score = 0;
+var gameOver = false;
+var scoreText;
+var num1; 
+var num2;
+var a;
+var r
+var l
+var u
+var d 
+var count = 0;
+var timedEvent;
+
+var game = new Phaser.Game(config);
+
+function preload ()
+{
+    this.load.image('food', 'assets/games/snake/food.png');
+    this.load.image('body', 'assets/games/snake/body.png');
+    coaster = this.load.image('coaster', 'assets/coaster.png');
+    this.load.image('answer1', 'assets/answer1.png');
+    this.load.image('sky', 'assets/sky.png');
+    this.load.image('ground', 'assets/platform.png');
+    this.load.image('star', 'assets/star.png');
+    this.load.image('bomb', 'assets/bomb.png');
+    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+}
+
+function create ()
+{
+    //  A simple background for our game
+    this.add.image(400, 300, 'coaster');
+    // game menu
+    this.add.image(400, 300, 'answer1');
+
+    // generate random question and answer
+    num1 = Phaser.Math.Between(1, 12);
+    num2 = Phaser.Math.Between(1, 12);
+    a = num1 * num2
+
+    // generate fake answers
+    u = Phaser.Math.Between(1, 144);
+    while(u == a)
+        u = Phaser.Math.Between(1, 144);
+    d = Phaser.Math.Between(1, 144);
+    while(d == a || d == u)
+        d = Phaser.Math.Between(1, 144);
+    r = Phaser.Math.Between(1, 144);
+    while(r == a || r == u || r == d)
+        r = Phaser.Math.Between(1, 144);
+    l = Phaser.Math.Between(1, 144);
+        while(l == a || l == u || l == d || l == r)
+        l = Phaser.Math.Between(1, 144);
+
+    // randomly replace one of the fake answers with the real answer
+    var temp = Phaser.Math.Between(1, 4);
+    if(temp == 1)
+        r = a
+    else if(temp == 2)
+        l = a
+    else if(temp == 3)
+        u = a
+    else if(temp == 4)
+        d = a
+
+    // question 
+    message = this.add.text(250, 20, "Begin", { fontSize: '78px', fill: '#000', boundsAlignH: "center" });
+    question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center" });
+    num = this.add.text(20, 20, count, { fontSize: '78px', fill: '#000' });
+
+
+    // puts "answers" into menu
+    up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
+    down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
+    left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+    right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+
+    //  Create our keyboard controls
+    cursors = this.input.keyboard.createCursorKeys();
+}
+
+function update (time, delta)
+{
+    if (count >= 20)
+    {
+        return;
+    }
+
+    /**
+    * Check which key is pressed, and then change the direction the snake
+    * is heading based on that. The checks ensure you don't double-back
+    * on yourself, for example if you're moving to the right and you press
+    * the LEFT cursor, it ignores it, because the only valid directions you
+    * can move in at that time is up and down.
+    */
+    // LEFT KEY PRESSED
+    if (this.input.keyboard.checkDown(cursors.left, 1000))
+    {
+        if(l == a){
+            message.setText("CORRECT");
+            count++;
+            num.setText(count);
+
+        }
+
+        else{
+
+            message.setText("INCORRECT");
+        }
+
+        up.destroy();
+        down.destroy();
+        right.destroy();
+        left.destroy();
+        question.destroy();
+
+        // generate random question and answer
+        num1 = Phaser.Math.Between(1, 12);
+        num2 = Phaser.Math.Between(1, 12);
+        a = num1 * num2
+
+        // generate fake answers
+        u = Phaser.Math.Between(1, 144);
+        while(u == a)
+            u = Phaser.Math.Between(1, 144);
+        d = Phaser.Math.Between(1, 144);
+        while(d == a || d == u)
+            d = Phaser.Math.Between(1, 144);
+        r = Phaser.Math.Between(1, 144);
+        while(r == a || r == u || r == d)
+            r = Phaser.Math.Between(1, 144);
+        l = Phaser.Math.Between(1, 144);
+            while(l == a || l == u || l == d || l == r)
+            l = Phaser.Math.Between(1, 144);
+
+        // randomly replace one of the fake answers with the real answer
+        var temp = Phaser.Math.Between(1, 4);
+        if(temp == 1)
+            r = a
+        else if(temp == 2)
+            l = a
+        else if(temp == 3)
+            u = a
+        else if(temp == 4)
+            d = a
+
+        // question 
+        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center"});
+
+
+        // puts "answers" into menu
+        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+    }
+
+
+    // RIGHT KEY PRESSED
+    else if (this.input.keyboard.checkDown(cursors.right, 1000))
+    {
+        if(r == a){
+            message.setText("CORRECT");
+            count++;
+            num.setText(count);
+
+        }
+
+        else{
+
+            message.setText("INCORRECT");
+        }
+
+        up.destroy();
+        down.destroy();
+        right.destroy();
+        left.destroy();
+        question.destroy();
+
+        // generate random question and answer
+        num1 = Phaser.Math.Between(1, 12);
+        num2 = Phaser.Math.Between(1, 12);
+        a = num1 * num2
+
+        // generate fake answers
+        u = Phaser.Math.Between(1, 144);
+        while(u == a)
+            u = Phaser.Math.Between(1, 144);
+        d = Phaser.Math.Between(1, 144);
+        while(d == a || d == u)
+            d = Phaser.Math.Between(1, 144);
+        r = Phaser.Math.Between(1, 144);
+        while(r == a || r == u || r == d)
+            r = Phaser.Math.Between(1, 144);
+        l = Phaser.Math.Between(1, 144);
+            while(l == a || l == u || l == d || l == r)
+            l = Phaser.Math.Between(1, 144);
+
+        // randomly replace one of the fake answers with the real answer
+        var temp = Phaser.Math.Between(1, 4);
+        if(temp == 1)
+            r = a
+        else if(temp == 2)
+            l = a
+        else if(temp == 3)
+            u = a
+        else if(temp == 4)
+            d = a
+
+        // question 
+        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000' });
+
+
+        // puts "answers" into menu
+        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+    }
+
+    // UP KEY PRESSED
+    else if (this.input.keyboard.checkDown(cursors.up, 1000))
+    {
+        if(u == a){
+            message.setText("CORRECT");
+            count++;
+            num.setText(count);
+        }
+
+        else{
+
+            message.setText("INCORRECT");
+        }
+
+        up.destroy();
+        down.destroy();
+        right.destroy();
+        left.destroy();
+        question.destroy();
+
+        // generate random question and answer
+        num1 = Phaser.Math.Between(1, 12);
+        num2 = Phaser.Math.Between(1, 12);
+        a = num1 * num2
+
+        // generate fake answers
+        u = Phaser.Math.Between(1, 144);
+        while(u == a)
+            u = Phaser.Math.Between(1, 144);
+        d = Phaser.Math.Between(1, 144);
+        while(d == a || d == u)
+            d = Phaser.Math.Between(1, 144);
+        r = Phaser.Math.Between(1, 144);
+        while(r == a || r == u || r == d)
+            r = Phaser.Math.Between(1, 144);
+        l = Phaser.Math.Between(1, 144);
+            while(l == a || l == u || l == d || l == r)
+            l = Phaser.Math.Between(1, 144);
+
+        // randomly replace one of the fake answers with the real answer
+        var temp = Phaser.Math.Between(1, 4);
+        if(temp == 1)
+            r = a
+        else if(temp == 2)
+            l = a
+        else if(temp == 3)
+            u = a
+        else if(temp == 4)
+            d = a
+
+        // question 
+        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000' });
+
+
+        // puts "answers" into menu
+        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+    }
+
+    // DOWN KEY PRESSED
+    else if (this.input.keyboard.checkDown(cursors.down, 1000)){
+        if(d == a){
+            message.setText("CORRECT");
+            count++;
+            num.setText(count);
+
+        }
+
+        else{
+            message.setText("INCORRECT");
+        }
+
+        up.destroy();
+        down.destroy();
+        right.destroy();
+        left.destroy();
+        question.destroy();
+
+        // generate random question and answer
+        num1 = Phaser.Math.Between(1, 12);
+        num2 = Phaser.Math.Between(1, 12);
+        a = num1 * num2
+
+        // generate fake answers
+        u = Phaser.Math.Between(1, 144);
+        while(u == a)
+            u = Phaser.Math.Between(1, 144);
+        d = Phaser.Math.Between(1, 144);
+        while(d == a || d == u)
+            d = Phaser.Math.Between(1, 144);
+        r = Phaser.Math.Between(1, 144);
+        while(r == a || r == u || r == d)
+            r = Phaser.Math.Between(1, 144);
+        l = Phaser.Math.Between(1, 144);
+            while(l == a || l == u || l == d || l == r)
+            l = Phaser.Math.Between(1, 144);
+
+        // randomly replace one of the fake answers with the real answer
+        var temp = Phaser.Math.Between(1, 4);
+        if(temp == 1)
+            r = a
+        else if(temp == 2)
+            l = a
+        else if(temp == 3)
+            u = a
+        else if(temp == 4)
+            d = a
+
+        // question 
+        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000' });
+
+
+        // puts "answers" into menu
+        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+
+        
+
+    }
+}
+
+function render() {
+
+    game.debug.text('Elapsed seconds: ' + this.game.time.totalElapsedSeconds(), 32, 32);
+
+}
+
+
+
+</script>
+
+</body>
+</html>
