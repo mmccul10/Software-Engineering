@@ -1,3 +1,4 @@
+
 <!doctype html> 
 <html lang="en"> 
 <head> 
@@ -77,24 +78,27 @@ function create ()
     // game menu
     this.add.image(400, 300, 'answer1');
 
+    // timer
+    timedEvent = this.time.addEvent({callbackScope: this});
+
     // generate random question and answer
     num1 = Phaser.Math.Between(1, 12);
     num2 = Phaser.Math.Between(1, 12);
-    a = num1 * num2
+    a = num1 - num2
 
     // generate fake answers
-    u = Phaser.Math.Between(1, 144);
+    u = Phaser.Math.Between(-12, 12);
     while(u == a)
-        u = Phaser.Math.Between(1, 144);
-    d = Phaser.Math.Between(1, 144);
+        u = Phaser.Math.Between(-12, 12);
+    d = Phaser.Math.Between(-12, 12);
     while(d == a || d == u)
-        d = Phaser.Math.Between(1, 144);
-    r = Phaser.Math.Between(1, 144);
+        d = Phaser.Math.Between(-12, 12);
+    r = Phaser.Math.Between(-12, 12);
     while(r == a || r == u || r == d)
-        r = Phaser.Math.Between(1, 144);
-    l = Phaser.Math.Between(1, 144);
+        r = Phaser.Math.Between(-12, 12);
+    l = Phaser.Math.Between(-12, 12);
         while(l == a || l == u || l == d || l == r)
-        l = Phaser.Math.Between(1, 144);
+        l = Phaser.Math.Between(-12, 12);
 
     // randomly replace one of the fake answers with the real answer
     var temp = Phaser.Math.Between(1, 4);
@@ -109,7 +113,7 @@ function create ()
 
     // question 
     message = this.add.text(250, 20, "Begin", { fontSize: '66px', fill: '#000', boundsAlignH: "center" });
-    question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center" });
+    question = this.add.text(250, 80, num1 + " - " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center" });
     num = this.add.text(20, 20, count, { fontSize: '66px', fill: '#000' });
 
 
@@ -144,6 +148,8 @@ function update (time, delta)
             message.setText("CORRECT");
             count++;
             num.setText(count);
+            coaster.scaleX *= 1.20;
+            coaster.scaleY *= 1.20;
 
         }
 
@@ -161,21 +167,21 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 * num2
+        a = num1 - num2
 
         // generate fake answers
-        u = Phaser.Math.Between(1, 144);
+        u = Phaser.Math.Between(-12, 12);
         while(u == a)
-            u = Phaser.Math.Between(1, 144);
-        d = Phaser.Math.Between(1, 144);
+            u = Phaser.Math.Between(-12, 12);
+        d = Phaser.Math.Between(-12, 12);
         while(d == a || d == u)
-            d = Phaser.Math.Between(1, 144);
-        r = Phaser.Math.Between(1, 144);
+            d = Phaser.Math.Between(-12, 12);
+        r = Phaser.Math.Between(-12, 12);
         while(r == a || r == u || r == d)
-            r = Phaser.Math.Between(1, 144);
-        l = Phaser.Math.Between(1, 144);
+            r = Phaser.Math.Between(-12, 12);
+        l = Phaser.Math.Between(-12, 12);
             while(l == a || l == u || l == d || l == r)
-            l = Phaser.Math.Between(1, 144);
+            l = Phaser.Math.Between(-12, 12);
 
         // randomly replace one of the fake answers with the real answer
         var temp = Phaser.Math.Between(1, 4);
@@ -189,7 +195,7 @@ function update (time, delta)
             d = a
 
         // question 
-        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center"});
+        question = this.add.text(250, 80, num1 + " - " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center"});
 
 
         // puts "answers" into menu
@@ -224,21 +230,21 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 * num2
+        a = num1 - num2
 
         // generate fake answers
-        u = Phaser.Math.Between(1, 144);
+        u = Phaser.Math.Between(-12, 12);
         while(u == a)
-            u = Phaser.Math.Between(1, 144);
-        d = Phaser.Math.Between(1, 144);
+            u = Phaser.Math.Between(-12, 12);
+        d = Phaser.Math.Between(-12, 12);
         while(d == a || d == u)
-            d = Phaser.Math.Between(1, 144);
-        r = Phaser.Math.Between(1, 144);
+            d = Phaser.Math.Between(-12, 12);
+        r = Phaser.Math.Between(-12, 12);
         while(r == a || r == u || r == d)
-            r = Phaser.Math.Between(1, 144);
-        l = Phaser.Math.Between(1, 144);
+            r = Phaser.Math.Between(-12, 12);
+        l = Phaser.Math.Between(-12, 12);
             while(l == a || l == u || l == d || l == r)
-            l = Phaser.Math.Between(1, 144);
+            l = Phaser.Math.Between(-12, 12);
 
         // randomly replace one of the fake answers with the real answer
         var temp = Phaser.Math.Between(1, 4);
@@ -252,7 +258,7 @@ function update (time, delta)
             d = a
 
         // question 
-        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000' });
+        question = this.add.text(250, 80, num1 + " - " + num2, { fontSize: '100px', fill: '#000' });
 
 
         // puts "answers" into menu
@@ -285,21 +291,21 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 * num2
+        a = num1 - num2
 
         // generate fake answers
-        u = Phaser.Math.Between(1, 144);
+        u = Phaser.Math.Between(-12, 12);
         while(u == a)
-            u = Phaser.Math.Between(1, 144);
-        d = Phaser.Math.Between(1, 144);
+            u = Phaser.Math.Between(-12, 12);
+        d = Phaser.Math.Between(-12, 12);
         while(d == a || d == u)
-            d = Phaser.Math.Between(1, 144);
-        r = Phaser.Math.Between(1, 144);
+            d = Phaser.Math.Between(-12, 12);
+        r = Phaser.Math.Between(-12, 12);
         while(r == a || r == u || r == d)
-            r = Phaser.Math.Between(1, 144);
-        l = Phaser.Math.Between(1, 144);
+            r = Phaser.Math.Between(-12, 12);
+        l = Phaser.Math.Between(-12, 12);
             while(l == a || l == u || l == d || l == r)
-            l = Phaser.Math.Between(1, 144);
+            l = Phaser.Math.Between(-12, 12);
 
         // randomly replace one of the fake answers with the real answer
         var temp = Phaser.Math.Between(1, 4);
@@ -313,7 +319,7 @@ function update (time, delta)
             d = a
 
         // question 
-        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000' });
+        question = this.add.text(250, 80, num1 + " - " + num2, { fontSize: '100px', fill: '#000' });
 
 
         // puts "answers" into menu
@@ -323,7 +329,6 @@ function update (time, delta)
         right = this.add.text(475, 325, r, { fontSize: '66px', fill: '#000' });
     }
 
-    // DOWN KEY PRESSED
     else if (this.input.keyboard.checkDown(cursors.down, 1000)){
         if(d == a){
             message.setText("CORRECT");
@@ -333,6 +338,7 @@ function update (time, delta)
         }
 
         else{
+
             message.setText("INCORRECT");
         }
 
@@ -345,21 +351,21 @@ function update (time, delta)
         // generate random question and answer
         num1 = Phaser.Math.Between(1, 12);
         num2 = Phaser.Math.Between(1, 12);
-        a = num1 * num2
+        a = num1 - num2
 
         // generate fake answers
-        u = Phaser.Math.Between(1, 144);
+        u = Phaser.Math.Between(-12, 12);
         while(u == a)
-            u = Phaser.Math.Between(1, 144);
-        d = Phaser.Math.Between(1, 144);
+            u = Phaser.Math.Between(-12, 12);
+        d = Phaser.Math.Between(-12, 12);
         while(d == a || d == u)
-            d = Phaser.Math.Between(1, 144);
-        r = Phaser.Math.Between(1, 144);
+            d = Phaser.Math.Between(-12, 12);
+        r = Phaser.Math.Between(-12, 12);
         while(r == a || r == u || r == d)
-            r = Phaser.Math.Between(1, 144);
-        l = Phaser.Math.Between(1, 144);
+            r = Phaser.Math.Between(-12, 12);
+        l = Phaser.Math.Between(-12, 12);
             while(l == a || l == u || l == d || l == r)
-            l = Phaser.Math.Between(1, 144);
+            l = Phaser.Math.Between(-12, 12);
 
         // randomly replace one of the fake answers with the real answer
         var temp = Phaser.Math.Between(1, 4);
@@ -373,7 +379,7 @@ function update (time, delta)
             d = a
 
         // question 
-        question = this.add.text(250, 80, num1 + " * " + num2, { fontSize: '100px', fill: '#000' });
+        question = this.add.text(250, 80, num1 + " - " + num2, { fontSize: '100px', fill: '#000' });
 
 
         // puts "answers" into menu
