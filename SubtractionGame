@@ -111,16 +111,16 @@ function create ()
         d = a
 
     // question 
-    message = this.add.text(250, 20, "Begin", { fontSize: '78px', fill: '#000', boundsAlignH: "center" });
+    message = this.add.text(250, 20, "Begin", { fontSize: '66px', fill: '#000', boundsAlignH: "center" });
     question = this.add.text(250, 80, num1 + " - " + num2, { fontSize: '100px', fill: '#000', boundsAlignH: "center" });
-    num = this.add.text(20, 20, count, { fontSize: '78px', fill: '#000' });
+    num = this.add.text(20, 20, count, { fontSize: '66px', fill: '#000' });
 
 
     // puts "answers" into menu
-    up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
-    down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
-    left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
-    right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+    up = this.add.text(350, 200, u, { fontSize: '66px', fill: '#000' });
+    down = this.add.text(350, 325, d, { fontSize: '66px', fill: '#000' });
+    left = this.add.text(225, 325, l, { fontSize: '66px', fill: '#000' });
+    right = this.add.text(475, 325, r, { fontSize: '66px', fill: '#000' });
 
     //  Create our keyboard controls
     cursors = this.input.keyboard.createCursorKeys();
@@ -198,10 +198,10 @@ function update (time, delta)
 
 
         // puts "answers" into menu
-        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
-        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
-        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
-        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+        up = this.add.text(350, 200, u, { fontSize: '66px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '66px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '66px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '66px', fill: '#000' });
     }
 
 
@@ -261,10 +261,10 @@ function update (time, delta)
 
 
         // puts "answers" into menu
-        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
-        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
-        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
-        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+        up = this.add.text(350, 200, u, { fontSize: '66px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '66px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '66px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '66px', fill: '#000' });
     }
 
     // UP KEY PRESSED
@@ -322,10 +322,10 @@ function update (time, delta)
 
 
         // puts "answers" into menu
-        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
-        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
-        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
-        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+        up = this.add.text(350, 200, u, { fontSize: '66px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '66px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '66px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '66px', fill: '#000' });
     }
 
     else if (this.input.keyboard.checkDown(cursors.down, 1000)){
@@ -382,10 +382,10 @@ function update (time, delta)
 
 
         // puts "answers" into menu
-        up = this.add.text(350, 200, u, { fontSize: '78px', fill: '#000' });
-        down = this.add.text(350, 325, d, { fontSize: '78px', fill: '#000' });
-        left = this.add.text(225, 325, l, { fontSize: '78px', fill: '#000' });
-        right = this.add.text(475, 325, r, { fontSize: '78px', fill: '#000' });
+        up = this.add.text(350, 200, u, { fontSize: '66px', fill: '#000' });
+        down = this.add.text(350, 325, d, { fontSize: '66px', fill: '#000' });
+        left = this.add.text(225, 325, l, { fontSize: '66px', fill: '#000' });
+        right = this.add.text(475, 325, r, { fontSize: '66px', fill: '#000' });
 
         
 
